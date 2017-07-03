@@ -1,7 +1,7 @@
 # GammaFramework
 Framework for L/S strategy development
 # Main parts
-* Data: 
+Data: 
 * train:https://s3-us-west-2.amazonaws.com/mikhailtest/train.csv.gz
 * test: https://s3-us-west-2.amazonaws.com/mikhailtest/test.csv.gz
 * Returns prediction [in this folder will be different regression models]
