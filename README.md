@@ -6,6 +6,6 @@ Data:
 * test: https://s3-us-west-2.amazonaws.com/mikhailtest/test.csv.gz
 
 Folders:
-* Regression [in this folder contains regression models]
+* Infra [in this folder contains all helper functions]
 * Strategy [in this folder contains modeling strategies, which use predictions from regression]
 * Sandbox [examples using components from returns prediction and strategy folders and some general theory]
