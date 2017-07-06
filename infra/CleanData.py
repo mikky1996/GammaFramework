@@ -15,7 +15,7 @@ class CleanData(object):
     def fill_by_last_valid_observ_for_each_asset(df):
         # If the NaN is in the first valid observation for specific asset then it will be replaced with 0
         df['ID1'] = df['ID']
-        df.groupby('ID').fillna(method = 'ffill').replace(np.nan, 0)
+        df = df.groupby('ID').fillna(method = 'ffill').replace(np.nan, 0)
         df['ID'] = df['ID1']
         del df['ID1']
         return df
@@ -38,7 +38,7 @@ class CleanData(object):
     # 5) ... substitute the existed column by the new one and return dataframe
     # !!! It starts 'func' only if the element on edge is not NaN !!! 
     # (Actually it's behaviour is weird when there are any of NaN values, so better to exclude them before start this function)
-    def apply_for_each_asset_class_frame_window(df, column_name, func, window = 30, min_periods = 1):
+    def apply_to_column_for_each_asset_class_frame_window(df, column_name, func, window = 30, min_periods = 1):
 
         warnings.warn("This function ignores NaN", DeprecationWarning)
 
@@ -48,6 +48,16 @@ class CleanData(object):
         df[column_name] = col
         return df
     
+    def apply_for_each_asset_class_frame_window(df, func, window = 30, min_periods = 1):
+
+        warnings.warn("This function ignores NaN", DeprecationWarning)
+
+        col = df.groupby('ID', group_keys = False).rolling(window=window, min_periods=min_periods).apply(func).sort_index()
+        real_index = [pair[1] for pair in col.index.values]
+        col.index = real_index
+        df[column_name] = col
+        return df
+
     # This function applies 'func' to the whole factor column (by windows) with out division on asset classes
     def apply_for_all_asset_class_frame_window(df, column_name, func, window = 30, min_periods = 1):
         
@@ -59,8 +69,6 @@ class CleanData(object):
 
 #--------------------------< Functions for feature transformation >---------------------  
 
-    #TODO add some default functions for data cleaning and NaN substitution in < Functions for feature transformation >
-
     # Function for window z-score, pass it to < Wrappers for feature transformation > functions
     def window_zscore(s):
         if (len(s) == 1):
@@ -71,10 +79,14 @@ class CleanData(object):
 
     # Function function detects outliers and if it finds it replases it with median of the window
     def window_winsorize(s):
-        q = pd.Series(data = s).quantile([0.05, 0.95])
+        q = pd.Series(data = s).quantile([0.01, 0.99])
         q_low  = q.iloc[0]
         q_high = q.iloc[1]
         s = list(s)
         if ((s[-1] < q_low) or (s[-1] > q_high)):
+            if (np.median(s) is None):
+                print(s)
             return np.median(s)
+        if (s[-1] is None):
+            print(s)
         return s[-1]
