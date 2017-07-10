@@ -9,23 +9,28 @@ import AssetsData
 
 class CleanData(object):
 
+    def __init__(self, asset_col = 'ID', time_col = 'TIMESTAMP', ret_col = 'y'):
+        self.asset_col = asset_col
+        self.time_col  = time_col
+        self.ret_col   = ret_col
+
 #--------------------------< Wrappers for NaN elimination > --------------------------
 
     # This function will find the previous valid observation for specific asset and replace the NaN by it
-    def fill_by_last_valid_observ_for_each_asset(df):
+    def fill_by_last_valid_observ_for_each_asset(self, df):
         # If the NaN is in the first valid observation for specific asset then it will be replaced with 0
-        df['ID1'] = df['ID']
-        df = df.groupby('ID').fillna(method = 'ffill').replace(np.nan, 0)
-        df['ID'] = df['ID1']
+        df['ID1'] = df[self.asset_col]
+        df = df.groupby(self.asset_col).fillna(method = 'ffill').replace(np.nan, 0)
+        df[self.asset_col] = df['ID1']
         del df['ID1']
         return df
 
     # This function will find the last valid observation for any asset and replace the NaN by it
-    def fill_by_last_valid_observ_for_all_asset(df):
+    def fill_by_last_valid_observ_for_all_asset(self, df):
         return df.fillna(method = 'ffill').replace(np.nan, 0)
 
     # This functino will just drop all the rows with NaN values
-    def drop_all(df):
+    def drop_all(self, df):
         return df.dropna()
 
 #----------------------< Wrappers for feature transformation >------------------------
@@ -38,28 +43,28 @@ class CleanData(object):
     # 5) ... substitute the existed column by the new one and return dataframe
     # !!! It starts 'func' only if the element on edge is not NaN !!! 
     # (Actually it's behaviour is weird when there are any of NaN values, so better to exclude them before start this function)
-    def apply_to_column_for_each_asset_class_frame_window(df, column_name, func, window = 30, min_periods = 1):
+    def apply_to_column_for_each_asset_class_frame_window(self, df, column_name, func, window = 30, min_periods = 1):
 
         warnings.warn("This function ignores NaN", DeprecationWarning)
 
-        col = df.groupby('ID', group_keys = False)[column_name].rolling(window=window, min_periods=min_periods).apply(func).sort_index()
+        col = df.groupby(self.asset_col, group_keys = False)[column_name].rolling(window=window, min_periods=min_periods).apply(func).sort_index()
         real_index = [pair[1] for pair in col.index.values]
         col.index = real_index
         df[column_name] = col
         return df
     
-    def apply_for_each_asset_class_frame_window(df, func, window = 30, min_periods = 1):
+    def apply_for_each_asset_class_frame_window(self, df, func, window = 30, min_periods = 1):
 
         warnings.warn("This function ignores NaN", DeprecationWarning)
 
-        col = df.groupby('ID', group_keys = False).rolling(window=window, min_periods=min_periods).apply(func).sort_index()
+        col = df.groupby(self.asset_col, group_keys = False).rolling(window=window, min_periods=min_periods).apply(func).sort_index()
         real_index = [pair[1] for pair in col.index.values]
         col.index = real_index
         df[column_name] = col
         return df
 
     # This function applies 'func' to the whole factor column (by windows) with out division on asset classes
-    def apply_for_all_asset_class_frame_window(df, column_name, func, window = 30, min_periods = 1):
+    def apply_for_all_asset_class_frame_window(self, df, column_name, func, window = 30, min_periods = 1):
         
         warnings.warn("This function ignores NaN", DeprecationWarning)
 
