@@ -80,7 +80,8 @@ class Evaluation(object):
 
     '''
     Find optimal parameters for model for the stock with 'folds' fold cross validation
-    model can be for example linear_model.Lasso()
+    1) model can be for example linear_model.Lasso()
+    2) param_name should match the name of the parameter in the model (e.x for Lasso() it is 'alpha')
     '''
     def parameter_estimation(self, df, model, min_val, max_val, param_partitions, param_name, asset_name, folds = 5, ret_col = 'y', factors = None):
 
