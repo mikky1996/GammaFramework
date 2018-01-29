@@ -8,5 +8,7 @@ Data:
 
 Folders:
 * Infra [This folder contains all helper classes]
-* Strategy [This folder contains modeling strategies]
+* Research [This folder contains the research of the data]
 * Sandbox [Examples of various kinds and some general theory]
+
+Address: https://github.com/mikky1996/GammaFramework/tree/master/
